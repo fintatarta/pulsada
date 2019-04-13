@@ -108,9 +108,13 @@ package pulse_simple_h is
 
   --* \struct pa_simple
   -- * An opaque simple connection object  
+  
+   function Pa_Strerror (Error : Int) return Strings.chars_ptr;
+   pragma Import (C, Pa_Strerror, "pa_strerror");
 
    type pa_simple is null record;   -- incomplete struct
-
+   type Pa_Simple_Access is access Pa_Simple;
+   
   --* Create a new connection to the server.  
    function pa_simple_new
      (server : Interfaces.C.Strings.chars_ptr;
@@ -121,7 +125,7 @@ package pulse_simple_h is
       ss : access constant pulse_sample_h.pa_sample_spec;
       map : access constant pulse_channelmap_h.pa_channel_map;
       attr : access constant pulse_def_h.pa_buffer_attr;
-      error : access int) return access pa_simple;  -- /usr/include/pulse/simple.h:120
+      error : access int) return Pa_Simple_Access;  -- /usr/include/pulse/simple.h:120
    pragma Import (C, pa_simple_new, "pa_simple_new");
 
   --*< Server name, or NULL for default  
