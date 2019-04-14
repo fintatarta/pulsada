@@ -1,12 +1,16 @@
 pragma Ada_2012;
 with Ada.Command_Line;
 
+with System.Address_To_Access_Conversions;
 with Interfaces.C.Strings;
+
 
 with Pulse_Def_H, Pulse_Sample_H;
 
 use Ada;
 package body Pulsada.Thin is
+
+
 
    ----------
    -- Open --
@@ -48,43 +52,53 @@ package body Pulsada.Thin is
 
    procedure Read
      (Session : in out Session_Type;
-      Data    :    out Frame_Blocks.Frame_Block)
+      Data    :        Frame_Block)
    is
+      use Interfaces;
+      use pulse_simple_h;
+      use type Interfaces.C.int;
+     pragma Warnings(off);
+      package convert is
+        new System.Address_To_Access_Conversions(Block_Buffer);
+
+      function size(data : Frame_Block) return c.size_t
+      is (c.size_t(Integer(data.N_Frames)*Integer(data.N_Channels)*2));
+
+      err : aliased c.int;
    begin
-      --  Generated stub: replace with real body!
-      pragma Compile_Time_Warning (Standard.True, "Read unimplemented");
-      raise Program_Error with "Unimplemented procedure Read";
-   end Read;
+      if pa_simple_read(s     => Session.S,
+                         data  => convert.To_Address(convert.Object_Pointer(data.Data)),
+                         bytes => size(data),
+                         error => err'Access) < 0 then
+             null;
+          end if;
+          end Read;
 
-   -----------
-   -- Close --
-   -----------
+          -----------
+          -- Close --
+          -----------
 
-   procedure Close (Session : in out Session_Type) is
-   begin
-      --  Generated stub: replace with real body!
-      pragma Compile_Time_Warning (Standard.True, "Close unimplemented");
-      raise Program_Error with "Unimplemented procedure Close";
-   end Close;
+          procedure Close (Session : in out Session_Type) is
+          begin
+          pulse_simple_h.pa_simple_free(session.s);
+          end Close;
 
-   ----------------
-   -- Initialize --
-   ----------------
+          ----------------
+          -- Initialize --
+          ----------------
 
-   overriding procedure Initialize (Obj : in out Session_Type) is
-   begin
-      Obj.S := null;
-   end Initialize;
+          overriding procedure Initialize (Obj : in out Session_Type) is
+          begin
+          Obj.S := null;
+          end Initialize;
 
-   --------------
-   -- Finalize --
-   --------------
+          --------------
+          -- Finalize --
+          --------------
 
-   overriding procedure Finalize (Obj : in out Session_Type) is
-   begin
-      --  Generated stub: replace with real body!
-      pragma Compile_Time_Warning (Standard.True, "Finalize unimplemented");
-      raise Program_Error with "Unimplemented procedure Finalize";
-   end Finalize;
+          overriding procedure Finalize (Obj : in out Session_Type) is
+          begin
+          obj.Close;
+          end Finalize;
 
-end Pulsada.Thin;
+          end Pulsada.Thin;

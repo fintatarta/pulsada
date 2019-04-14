@@ -1,5 +1,4 @@
 with Ada.Finalization;
-with Pulsada.Frame_Blocks;
 
 use Ada;
 
@@ -12,13 +11,13 @@ package Pulsada.Thin is
      private;
 
    procedure Open (Session           : in out Session_Type;
-      Rate              : Sampling_Frequency;
-      N_Channels        : Channel_Index;
-      Application_Name  : String := "";
+                   Rate              : Sampling_Frequency;
+                   N_Channels        : Channel_Index;
+                   Application_Name  : String := "";
                    Stream_Name       : String := "");
 
    procedure Read (Session : in out Session_Type;
-                   Data    :    out Frame_Blocks.Frame_Block);
+                   Data    :        Frame_Block);
 
    procedure Close (Session : in out Session_Type);
 private
