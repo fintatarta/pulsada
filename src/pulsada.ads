@@ -47,4 +47,7 @@ private
 
    overriding procedure Finalize (Object : in out Frame_Block);
 
+   function N_Frames (Item : Frame_Block) return Frame_Counter
+   is (Item.N_Frames);
+
 end Pulsada;

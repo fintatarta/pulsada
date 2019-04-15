@@ -1,4 +1,7 @@
 pragma Ada_2012;
+with Ada.Unchecked_Deallocation;
+
+use Ada;
 package body Pulsada is
 
    ---------------
@@ -10,25 +13,15 @@ package body Pulsada is
       N_Frames   : Frame_Counter)
       return Frame_Block
    is
+      N : constant Positive := Positive (N_Channels) * Positive (N_Frames);
    begin
-      --  Generated stub: replace with real body!
-      pragma Compile_Time_Warning (Standard.True, "New_Block unimplemented");
-      return raise Program_Error with "Unimplemented function New_Block";
+      return Frame_Block'(Finalization.Limited_Controlled with
+                            Data       => new Block_Buffer (1 .. N),
+                          N_Frames   => N_Frames,
+                          N_Channels => N_Channels);
    end New_Block;
 
-   --------------
-   -- N_Frames --
-   --------------
 
-   function N_Frames
-     (Item : Frame_Block)
-      return Frame_Counter
-   is
-   begin
-      --  Generated stub: replace with real body!
-      pragma Compile_Time_Warning (Standard.True, "N_Frames unimplemented");
-      return raise Program_Error with "Unimplemented function N_Frames";
-   end N_Frames;
 
    ---------
    -- Get --
@@ -39,10 +32,12 @@ package body Pulsada is
       N     : Frame_Counter)
       return Frame
    is
+      First  : constant Natural :=
+                 Block.Data'First + (Natural (N) - Natural (Frame_Counter'First)) * Natural (Block.N_Channels);
+
+      Last   : constant Positive := First + Natural (Block.N_Channels)-1;
    begin
-      --  Generated stub: replace with real body!
-      pragma Compile_Time_Warning (Standard.True, "Get unimplemented");
-      return raise Program_Error with "Unimplemented function Get";
+      return Frame (Block.Data (First .. Last));
    end Get;
 
    --------------
@@ -50,10 +45,11 @@ package body Pulsada is
    --------------
 
    overriding procedure Finalize (Object : in out Frame_Block) is
+      procedure Free is
+        new Unchecked_Deallocation (Object => Block_Buffer,
+                                    Name   => Block_Buffer_Access);
    begin
-      --  Generated stub: replace with real body!
-      pragma Compile_Time_Warning (Standard.True, "Finalize unimplemented");
-      raise Program_Error with "Unimplemented procedure Finalize";
+      Free (Object.Data);
    end Finalize;
 
 end Pulsada;

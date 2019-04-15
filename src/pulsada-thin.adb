@@ -36,7 +36,7 @@ package body Pulsada.Thin is
    begin
       Session.S := Pa_Simple_New
         (Server      => C.Strings.Null_Ptr,
-         Name        => Use_Default(Application_Name, Command_Line.Command_Name),
+         Name        => Use_Default (Application_Name, Command_Line.Command_Name),
          Dir         => Pulse_Def_H.PA_STREAM_RECORD,
          Dev         => C.Strings.Null_Ptr,
          Stream_Name => Use_Default (Stream_Name, "stream"),
@@ -55,50 +55,50 @@ package body Pulsada.Thin is
       Data    :        Frame_Block)
    is
       use Interfaces;
-      use pulse_simple_h;
-      use type Interfaces.C.int;
-     pragma Warnings(off);
-      package convert is
-        new System.Address_To_Access_Conversions(Block_Buffer);
+      use Pulse_Simple_H;
+      use type Interfaces.C.Int;
+      pragma Warnings (Off);
+      package Convert is
+        new System.Address_To_Access_Conversions (Block_Buffer);
 
-      function size(data : Frame_Block) return c.size_t
-      is (c.size_t(Integer(data.N_Frames)*Integer(data.N_Channels)*2));
+      function Size (Data : Frame_Block) return C.Size_T
+      is (C.Size_T (Integer (Data.N_Frames) * Integer (Data.N_Channels) * 2));
 
-      err : aliased c.int;
+      Err : aliased C.Int;
    begin
-      if pa_simple_read(s     => Session.S,
-                         data  => convert.To_Address(convert.Object_Pointer(data.Data)),
-                         bytes => size(data),
-                         error => err'Access) < 0 then
-             null;
-          end if;
-          end Read;
+      if Pa_Simple_Read (S     => Session.S,
+                         Data  => Convert.To_Address (Convert.Object_Pointer (Data.Data)),
+                         Bytes => Size (Data),
+                         Error => Err'Access) < 0 then
+         null;
+      end if;
+   end Read;
 
-          -----------
-          -- Close --
-          -----------
+   -----------
+   -- Close --
+   -----------
 
-          procedure Close (Session : in out Session_Type) is
-          begin
-          pulse_simple_h.pa_simple_free(session.s);
-          end Close;
+   procedure Close (Session : in out Session_Type) is
+   begin
+      Pulse_Simple_H.Pa_Simple_Free (Session.S);
+   end Close;
 
-          ----------------
-          -- Initialize --
-          ----------------
+   ----------------
+   -- Initialize --
+   ----------------
 
-          overriding procedure Initialize (Obj : in out Session_Type) is
-          begin
-          Obj.S := null;
-          end Initialize;
+   overriding procedure Initialize (Obj : in out Session_Type) is
+   begin
+      Obj.S := null;
+   end Initialize;
 
-          --------------
-          -- Finalize --
-          --------------
+   --------------
+   -- Finalize --
+   --------------
 
-          overriding procedure Finalize (Obj : in out Session_Type) is
-          begin
-          obj.Close;
-          end Finalize;
+   overriding procedure Finalize (Obj : in out Session_Type) is
+   begin
+      Obj.Close;
+   end Finalize;
 
-          end Pulsada.Thin;
+end Pulsada.Thin;
